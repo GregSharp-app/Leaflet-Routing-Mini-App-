@@ -1,0 +1,238 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+
+    <!-- Leaflet -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+
+    <!-- Routing Machine -->
+    <link rel="stylesheet" href="leaflet-routing-machine.css" />
+    <script src="leaflet-routing-machine.js"></script>
+
+    <!-- GeoCoding -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+    />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+    <!-- Styles -->
+    <style>
+      #map {
+        height: 96.9vh;
+        width: 78vw;
+      }
+      h5 {
+        color: #7c795d;
+        font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+        font-size: 35px;
+        font-weight: normal;
+        line-height: 48px;
+        margin: 0;
+      }
+
+      .my-controllers {
+        position: absolute;
+        right: 2vw;
+        top: 2vw;
+        z-index: 4;
+        width: 16vw;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 15px;
+        border-radius: 10px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+          rgba(0, 0, 0, 0.3) 0px 30px 60px -30px,
+          rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+      }
+      .active-bg {
+        background-color: #00fa53 !important;
+      }
+      .my-controllers button i {
+        margin-right: 5px;
+      }
+      .my-controllers button {
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.25rem;
+        box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+        box-sizing: border-box;
+        color: rgba(0, 0, 0, 0.85);
+        cursor: pointer;
+        display: inline-flex;
+        font-family: system-ui, -apple-system, system-ui, "Helvetica Neue",
+          Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        justify-content: start;
+        line-height: 1.25;
+        margin: 0;
+        min-height: 3rem;
+        padding: calc(0.875rem - 1px) calc(1.5rem - 1px);
+        position: relative;
+        text-decoration: none;
+        transition: all 250ms;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+        vertical-align: baseline;
+        width: auto;
+        height: fit-content;
+      }
+
+      .my-controllers button:hover,
+      .my-controllers button:focus {
+        border-color: rgba(0, 0, 0, 0.15);
+        box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+        color: rgba(0, 0, 0, 0.65);
+      }
+
+      .my-controllers button:hover {
+        transform: translateY(-1px);
+      }
+
+      .my-controllers button:active {
+        background-color: #f0f0f1;
+        border-color: rgba(0, 0, 0, 0.15);
+        box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+        color: rgba(0, 0, 0, 0.65);
+        transform: translateY(0);
+      }
+
+      .btn {
+        margin-right: 10px;
+        background-color: #c2fbd7;
+        border-radius: 100px;
+        box-shadow: rgba(44, 187, 99, 0.2) 0 -25px 18px -14px inset,
+          rgba(44, 187, 99, 0.15) 0 1px 2px, rgba(44, 187, 99, 0.15) 0 2px 4px,
+          rgba(44, 187, 99, 0.15) 0 4px 8px, rgba(44, 187, 99, 0.15) 0 8px 16px,
+          rgba(44, 187, 99, 0.15) 0 16px 32px;
+        color: green;
+        cursor: pointer;
+        display: inline-block;
+        font-family: CerebriSans-Regular, -apple-system, system-ui, Roboto,
+          sans-serif;
+        padding: 7px 20px;
+        text-align: center;
+        text-decoration: none;
+        transition: all 250ms;
+        border: 0;
+        font-size: 16px;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+
+      .btn:hover {
+        box-shadow: rgba(44, 187, 99, 0.35) 0 -25px 18px -14px inset,
+          rgba(44, 187, 99, 0.25) 0 1px 2px, rgba(44, 187, 99, 0.25) 0 2px 4px,
+          rgba(44, 187, 99, 0.25) 0 4px 8px, rgba(44, 187, 99, 0.25) 0 8px 16px,
+          rgba(44, 187, 99, 0.25) 0 16px 32px;
+        transform: scale(1.05) rotate(-1deg);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="my-controllers">
+      <h5>Menu</h5>
+      <button onclick="TogglePopup(this)">
+        <i class="fa fa-window-restore"></i> Popup Window
+      </button>
+      <button onclick="ToggleWayPoints(this)">
+        <i class="fa fa-plus">
+          <i class="fa fa-map-marker"></i>
+        </i>
+        Add Waypoints
+      </button>
+      <h5>Directions</h5>
+      <button>
+        Next
+        <i class="fa fa-angle-right" style="margin-left: auto"></i>
+      </button>
+      <button>
+        Previous
+        <i class="fa fa-angle-left" style="margin-left: auto"></i>
+      </button>
+
+      <!-- <button onclick="ToggleRemoveWayPoints(this)">
+        <i class="fa fa-minus-square"></i> Clear waypoints
+      </button> -->
+    </div>
+
+  </body>
+  <script>
+    // my controllers
+    var enablePopup = false;
+    var enableAddWayPoints = false;
+
+    // setup the map
+    var map = L.map("map").setView([0, 0], 10);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    // initialize the plugin
+    var control = L.Routing.control({
+      waypoints: [L.latLng(34.051572, -6.81257), L.latLng(34.035, -6.817533)],
+      routeWhileDragging: true,
+      lineOptions: {
+        addWaypoints: false,
+      },
+      geocoder: L.Control.Geocoder.nominatim(),
+    }).addTo(map);
+
+    // displaying popup window on the map
+    function createButton(label, container) {
+      var btn = L.DomUtil.create("button", "", container);
+      btn.setAttribute("type", "button");
+      btn.classList.add("btn");
+      btn.innerHTML = label;
+      return btn;
+    }
+    map.on("click", function (e) {
+      if (!enablePopup) return;
+      // create buttons
+      var container = L.DomUtil.create("div"),
+        startBtn = createButton("Start location", container),
+        destBtn = createButton("Destination", container);
+      // set up the popup window
+      L.popup().setContent(container).setLatLng(e.latlng).openOn(map);
+
+      // adding functionality to the buttons
+      L.DomEvent.on(startBtn, "click", function () {
+        control.spliceWaypoints(0, 1, e.latlng);
+        map.closePopup();
+      });
+      L.DomEvent.on(destBtn, "click", function () {
+        control.spliceWaypoints(control.getWaypoints().length - 1, 1, e.latlng);
+        map.closePopup();
+      });
+    });
+  </script>
+  <script src="my-js.js"></script>
+</html>
